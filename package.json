@@ -4,8 +4,9 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "vite",
-        "build": "vite build && tsc",
+        "dev": "cross-env REACT_APP_ENV=development vite",
+        "build": "cross-env REACT_APP_ENV=development vite build && tsc",
+        "build-prod": "cross-env REACT_APP_ENV=production vite build && tsc",
         "preview": "vite preview"
     },
     "dependencies": {
@@ -30,6 +31,7 @@
         "@types/react-text-mask": "^5.4.11",
         "@x1mrdonut1x/nouislider-react": "^3.4.3",
         "apexcharts": "^3.37.1",
+        "cross-env": "^7.0.3",
         "easymde": "^2.18.0",
         "formik": "^2.2.9",
         "highlight.js": "^11.6.0",
