@@ -22,8 +22,8 @@ const Index = () => {
 
     const [filter, setFilter] = useState<Filter>({
         countryCode: '',
-        stateCode: '',
-        city: ''
+        stateCode: '', // There's no existing API from Ticketmaster that can fetch the list of available state code for a countr
+        city: '' // There's no existing API from Ticketmaster that can fetch the list of available city for a state
     });
 
     const [eventList, setEventList] = useState<TMEvent[]>([]);
@@ -408,11 +408,7 @@ const Index = () => {
                                 type="button"
                                 className={paginatorCommon + paginatorInactive}
                                 onClick={() => {
-                                    handlePageChange
-                                    setPage({
-                                        ...page,
-                                        number: page.number + 1
-                                    })
+                                    handlePageChange(page.number + 1)
                                 }}
                             >
                                 Next
@@ -423,10 +419,7 @@ const Index = () => {
                                 type="button"
                                 className={paginatorCommon + paginatorInactive}
                                 onClick={() => {
-                                    setPage({
-                                        ...page,
-                                        number: page.totalPages - 1
-                                    })
+                                    handlePageChange(page.totalPages - 1)
                                 }}
                             >
                                 Last
