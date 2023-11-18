@@ -1175,7 +1175,8 @@ const Index = () => {
                     </Dropdown>
                 </div>
             </div>
-            <Swiper
+            {/* Turns out the images of an event are just the same image in different size and ratio, no need for swiper */}
+            {/* <Swiper
                 modules={[Navigation, Autoplay, Pagination]}
                 navigation={{ nextEl: '.swiper-button-next-ex2', prevEl: '.swiper-button-prev-ex2' }}
                 pagination={{ clickable: true }}
@@ -1201,7 +1202,8 @@ const Index = () => {
                 <button className="swiper-button-next-ex2 grid place-content-center ltr:right-2 rtl:left-2 p-1 transition text-primary hover:text-white border border-primary  hover:border-primary hover:bg-primary rounded-full absolute z-[999] top-1/2 -translate-y-1/2">
                     <IconCaretDown className="w-5 h-5 rtl:rotate-90 -rotate-90" />
                 </button>
-            </Swiper>
+            </Swiper> */}
+            <img src={event.images.filter(i => i.ratio == '16_9')[0].url} className="w-full max-h-80 object-cover mb-9" alt="itemImage" />
             <div className="space-y-9">
                 <div className="flex items-center">
                     <div className="flex-1">
@@ -1461,6 +1463,74 @@ const Index = () => {
 
             <div className="pt-5">
                 
+            <div className="p-4 mb-5 border-b border-[#ebedf2] dark:border-[#253b5c] grid grid-rows-1 sm:grid-cols-4 gap-4">
+                <div>
+                    <div className="font-semibold mb-1.5">Action</div>
+                        <select className="form-select text-white-dark">
+                            <option>Buy</option>
+                            <option>Sell</option>
+                        </select>
+                    </div>
+                    <div>
+                        <div className="font-semibold mb-1.5">Wallet</div>
+                        <select className="form-select text-white-dark">
+                            <option>Bitcoin</option>
+                            <option>Ethereum</option>
+                            <option>Zcash</option>
+                            <option>Litecoin</option>
+                            <option>Binance</option>
+                            <option>Solana</option>
+                            <option>Tether</option>
+                        </select>
+                    </div>
+                    <div>
+                        <div className="font-semibold mb-1.5">Amount</div>
+                        <div className="flex relative">
+                            <input type="text" placeholder="" className="form-input ltr:rounded-r-none rtl:rounded-l-none ltr:border-r-0 rtl:border-l-0" />
+
+                            <div className="dropdown">
+                                <Dropdown
+                                    offset={[0, 5]}
+                                    placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
+                                    btnClassName="bg-[#f1f2f3] dark:bg-[#1b2e4b] !flex justify-center gap-1 items-center rounded-none px-3 py-2 font-semibold border dark:border-[#253b5c] ltr:rounded-r-md rtl:rounded-l-md cursor-pointer"
+                                    button={
+                                        <>
+                                            BTC
+                                            <IconCaretDown />
+                                        </>
+                                    }
+                                >
+                                    <ul>
+                                        <li>
+                                            <button type="button">BTC</button>
+                                        </li>
+                                        <li>
+                                            <button type="button">ETH</button>
+                                        </li>
+                                        <li>
+                                            <button type="button">ZEC</button>
+                                        </li>
+                                        <li>
+                                            <button type="button">LTC</button>
+                                        </li>
+                                        <li>
+                                            <button type="button">BNB</button>
+                                        </li>
+                                        <li>
+                                            <button type="button">SOL</button>
+                                        </li>
+                                        <li>
+                                            <button type="button">USDT</button>
+                                        </li>
+                                    </ul>
+                                </Dropdown>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" className="btn btn-primary self-end">
+                        Buy
+                    </button>
+                </div>
                 <div className="grid sm:grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
                     {
                         eventList.map((event) => 
