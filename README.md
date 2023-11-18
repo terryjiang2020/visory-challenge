@@ -27,3 +27,23 @@ The only requirements for the assignment are:
 Feel free to tackle this problem in a way that demonstrates your expertise of an area -- or takes you out of your comfort zone.
 
 Good luck!
+
+## Run this project locally
+
+> npm i && npm run dev
+
+You will also need to create a file named ".env.development" with the following format:
+
+> VITE_TICKETMASTER_KEY=[enter your ticketmaster API key here]
+
+And then you can visit the site at <http://localhost:5173>
+
+If you wish to build it instead, create a file named ".env.production" with the same content. The command will be the following:
+
+> npm i && npm run build-prod && npm run preview
+
+And then you can visit the site at <http://localhost:4173>
+
+The page that has filter and event listing would be displayed as the home page. You can filter the events by country.
+
+It seems the Ticketmaster API does not provide an option to fetch the list of supported state codes or cities, so I have to skip that for now. Please let me know if you expect me to add any other features.
