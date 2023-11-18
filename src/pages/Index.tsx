@@ -66,6 +66,9 @@ const Index = () => {
                     setEventList([]);
                 }
                 if (res.page) {
+                    // Ticketmaster API only allows up to 1000 results in total
+                    // 50 (page number) * 20 (page size) = 1000, hence 50 would be the maximum page number allowed here
+                    res.page.totalPages = Math.min(res.page.totalPages, 50);
                     setPage(res.page);
                 }
                 else {
@@ -75,6 +78,7 @@ const Index = () => {
             })
             .catch(err => {
                 console.error('getEventListFull failed, error: ', err);
+                setLoading(false);
             })
         }
         else {
