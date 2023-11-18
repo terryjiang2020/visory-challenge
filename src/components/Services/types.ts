@@ -28,6 +28,8 @@ export type TMEvent = {
     ticketing: TMTicketing;
     _links: TMLinks;
     _embedded: TMEmbedded;
+    textExpanded?: boolean;
+    textExpandable?: boolean;
 }
 
 export type TMImage = {
@@ -52,6 +54,7 @@ export type TMPublic = {
 export type TMDates = {
     start: TMStart;
     status: TMStatus;
+    end?: TMStatus;
     spanMultipleDays: boolean;
 }
 
