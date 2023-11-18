@@ -20,6 +20,13 @@ import IconBolt from '../components/Icon/IconBolt';
 import IconCaretDown from '../components/Icon/IconCaretDown';
 import IconPlus from '../components/Icon/IconPlus';
 import IconMultipleForwardRight from '../components/Icon/IconMultipleForwardRight';
+import { getEventListFull } from '../components/Services/shared';
+import { Filter, TMEvent, TMPage } from '../components/Services/types';
+import { Navigation, Pagination, Autoplay } from 'swiper';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 const Index = () => {
     const dispatch = useDispatch();
@@ -31,6 +38,8 @@ const Index = () => {
 
     const [loading] = useState(false);
 
+    const themeConfig = useSelector((state: IRootState) => state.themeConfig);
+    
     //Revenue Chart
     const revenueChart: any = {
         series: [
@@ -401,7 +410,56 @@ const Index = () => {
         },
     };
 
-    return (
+    const [filter, setFilter] = useState<Filter>({
+        countryCode: '',
+        stateCode: '',
+        city: ''
+    });
+
+    const [eventList, setEventList] = useState<TMEvent[]>([]);
+
+    const [page, setPage] = useState<TMPage>({
+        size: 20,
+        totalElements: 0,
+        totalPages: 0,
+        number: 0
+    });
+
+    useEffect(() => {
+        console.log('useEffect fired');
+        getEventListFull(filter, page.number).then((res) => {
+            if (res._embedded && res._embedded.events) {
+                setEventList(res._embedded.events);
+            }
+            if (res.page) {
+                setPage(res.page);
+            }
+        })
+        .catch(err => {
+            console.error('getEventListFull failed, error: ', err);
+        })
+    }, [filter, page.number]);
+    // }, []);
+
+    useEffect(() => {
+        console.log('eventList: ', eventList);
+    }, [eventList])
+
+    useEffect(() => {
+        console.log('page: ', page);
+    }, [page])
+
+    const handlePageChange = (pageNumber: number) => {
+        if (pageNumber < page.totalPages && pageNumber >= 0) {
+            setPage({
+                ...page,
+                number: pageNumber
+            });
+        }
+    }
+
+    const oldRender = () => (
+
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
                 <li>
@@ -1092,6 +1150,334 @@ const Index = () => {
                 </div>
             </div>
         </div>
+    )
+
+    const eventEle = (event: TMEvent) => (
+        <div className="panel h-full">
+            <div className="flex items-center justify-between dark:text-white-light mb-5">
+                <h5 className="font-semibold text-lg">{event.name}</h5>
+                <div className="dropdown">
+                    <Dropdown
+                        placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
+                        button={<IconHorizontalDots className="w-5 h-5 text-black/70 dark:text-white/70 hover:!text-primary" />}
+                    >
+                        <ul>
+                            <li>
+                                <button type="button">View Report</button>
+                            </li>
+                            <li>
+                                <button type="button">Edit Report</button>
+                            </li>
+                            <li>
+                                <button type="button">Mark as Done</button>
+                            </li>
+                        </ul>
+                    </Dropdown>
+                </div>
+            </div>
+            <Swiper
+                modules={[Navigation, Autoplay, Pagination]}
+                navigation={{ nextEl: '.swiper-button-next-ex2', prevEl: '.swiper-button-prev-ex2' }}
+                pagination={{ clickable: true }}
+                loop={true}
+                autoplay={{ delay: 2000 }}
+                className="swiper max-w-3xl mx-auto mb-5"
+                id="slider2"
+                dir={themeConfig.rtlClass}
+                key={themeConfig.rtlClass === 'rtl' ? 'true' : 'false'}
+            >
+                <div className="swiper-wrapper">
+                    {event.images.map((item, i) => {
+                        return (
+                            <SwiperSlide key={i}>
+                                <img src={item.url} className="w-full max-h-80 object-cover" alt="itemImage" />
+                            </SwiperSlide>
+                        );
+                    })}
+                </div>
+                <button className="swiper-button-prev-ex2 grid place-content-center ltr:left-2 rtl:right-2 p-1 transition text-primary hover:text-white border border-primary  hover:border-primary hover:bg-primary rounded-full absolute z-[999] top-1/2 -translate-y-1/2">
+                    <IconCaretDown className="w-5 h-5 rtl:-rotate-90 rotate-90" />
+                </button>
+                <button className="swiper-button-next-ex2 grid place-content-center ltr:right-2 rtl:left-2 p-1 transition text-primary hover:text-white border border-primary  hover:border-primary hover:bg-primary rounded-full absolute z-[999] top-1/2 -translate-y-1/2">
+                    <IconCaretDown className="w-5 h-5 rtl:rotate-90 -rotate-90" />
+                </button>
+            </Swiper>
+            <div className="space-y-9">
+                <div className="flex items-center">
+                    <div className="flex-1">
+                        <div className="flex font-semibold text-white-dark mb-2">
+                            <h6>Type</h6>
+                        </div>
+                        <div>
+                            <p className="ltr:ml-auto rtl:mr-auto">{event.type}</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="flex items-center">
+                    <div className="flex-1">
+                        <div className="flex font-semibold text-white-dark mb-2">
+                            <h6>Information</h6>
+                        </div>
+                        <div>
+                            <p className="ltr:ml-auto rtl:mr-auto">{event.info ? event.info : 'No information provided.'}</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="flex items-center">
+                    <div className="flex-1">
+                        <p className="ltr:ml-auto rtl:mr-auto underline hover:no-underline">
+                            <Link to={event.url} target="_blank">View on Ticketmaster</Link>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+
+    const paginatorCommon = "flex justify-center font-semibold px-3.5 py-2 rounded transition border-2";
+
+    const paginatorActive = " text-primary border-primary dark:border-primary dark:text-white-light";
+
+    const paginatorInactive = " text-dark hover:text-primary border-white-light dark:border-[#191e3a] hover:border-primary dark:hover:border-primary dark:text-white-light";
+
+    const paginator = () => (
+        <ul className="inline-flex items-center space-x-1 rtl:space-x-reverse m-auto mb-4">
+            {
+                page.number !== 0 && (
+                    <>
+                        <li>
+                            <button
+                                type="button"
+                                className={paginatorCommon + paginatorInactive}
+                                onClick={() => {
+                                    handlePageChange(0)
+                                }}
+                            >
+                                First
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                type="button"
+                                className={paginatorCommon + paginatorInactive}
+                                onClick={() => {
+                                    handlePageChange(page.number - 1)
+                                }}
+                            >
+                                Prev
+                            </button>
+                        </li>
+                    </>
+                )
+            }
+            {
+                page.number == 0
+                ?
+                // When user is on the first page
+                <>
+                    <li>
+                        <button
+                            type="button"
+                            className={paginatorCommon + paginatorActive}
+                        >
+                            {
+                                page.number + 1
+                            }
+                        </button>
+                    </li>
+                    {
+                        page.totalPages > page.number + 1 &&
+                        <li>
+                            <button
+                                type="button"
+                                className={paginatorCommon + paginatorInactive}
+                                onClick={() => {
+                                    handlePageChange(page.number + 1)
+                                }}
+                            >
+                                {
+                                    page.number + 2
+                                }
+                            </button>
+                        </li>
+                    }
+                    {
+                        page.totalPages > page.number + 2 &&
+                        <li>
+                            <button
+                                type="button"
+                                className={paginatorCommon + paginatorInactive}
+                                onClick={() => {
+                                    handlePageChange(page.number + 2)
+                                }}
+                            >
+                                {
+                                    page.number + 3
+                                }
+                            </button>
+                        </li>
+                    }
+                </>
+                :
+                page.number == page.totalPages - 1
+                ?
+                // When user is on the last page
+                <>
+                    {
+                        page.number - 2 >= 0 &&
+                        <li>
+                            <button
+                                type="button"
+                                className={paginatorCommon + paginatorInactive}
+                                onClick={() => {
+                                    handlePageChange(page.number - 2)
+                                }}
+                            >
+                                {
+                                    page.number - 1
+                                }
+                            </button>
+                        </li>
+                    }
+                    {
+                        page.number - 1 >= 0 &&
+                        <li>
+                            <button
+                                type="button"
+                                className={paginatorCommon + paginatorInactive}
+                                onClick={() => {
+                                    handlePageChange(page.number - 1)
+                                }}
+                            >
+                                {
+                                    page.number
+                                }
+                            </button>
+                        </li>
+                    }
+                    <li>
+                        <button
+                            type="button"
+                            className={paginatorCommon + paginatorActive}
+                        >
+                            {
+                                page.number + 1
+                            }
+                        </button>
+                    </li>
+                </>
+                :
+                // Otherwise, user is on the middle page
+                // Which means there must be at least 3 pages
+                <>
+                    <li>
+                        <button
+                            type="button"
+                            className={paginatorCommon + paginatorInactive}
+                            onClick={() => {
+                                handlePageChange(page.number - 1)
+                            }}
+                        >
+                            {
+                                page.number
+                            }
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            type="button"
+                            className={paginatorCommon + paginatorActive}
+                        >
+                            {
+                                page.number + 1
+                            }
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            type="button"
+                            className={paginatorCommon + paginatorInactive}
+                            onClick={() => {
+                                handlePageChange(page.number + 1)
+                            }}
+                        >
+                            {
+                                page.number + 2
+                            }
+                        </button>
+                    </li>
+                </>
+            }
+            {
+                page.number !== page.totalPages - 1 && (
+                    <>
+                        <li>
+                            <button
+                                type="button"
+                                className={paginatorCommon + paginatorInactive}
+                                onClick={() => {
+                                    handlePageChange
+                                    setPage({
+                                        ...page,
+                                        number: page.number + 1
+                                    })
+                                }}
+                            >
+                                Next
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                type="button"
+                                className={paginatorCommon + paginatorInactive}
+                                onClick={() => {
+                                    setPage({
+                                        ...page,
+                                        number: page.totalPages - 1
+                                    })
+                                }}
+                            >
+                                Last
+                            </button>
+                        </li>
+                    </>
+                )
+            }
+        </ul>
+    )
+
+    return (
+        <div>
+            <ul className="flex space-x-2 rtl:space-x-reverse">
+                <li>
+                    <Link to="/" className="text-primary hover:underline">
+                        Dashboard
+                    </Link>
+                </li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                    <span>Sales</span>
+                </li>
+            </ul>
+
+            <div className="pt-5">
+                
+                <div className="grid sm:grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+                    {
+                        eventList.map((event) => 
+                            <div key={event.id}>
+                                {eventEle(event)}
+                            </div>
+                        )
+                    }
+                </div>
+                <div className="flex justify-center">
+                    {
+                        paginator()
+                    }
+                </div>
+            </div>
+        </div>
+
     );
 };
 
