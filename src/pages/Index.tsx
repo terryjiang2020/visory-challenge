@@ -40,7 +40,6 @@ const Index = () => {
     function expandText(index: number) {
         const newEventList = [...eventList];
         newEventList[index].textExpanded = !newEventList[index].textExpanded;
-        newEventList[index].textExpandable = true;
         setEventList(newEventList);
         setTimeout(() => {
             console.log(document.getElementById("info-" + index)!.scrollHeight, document.getElementById("info-" + index)!.clientHeight)
@@ -198,15 +197,7 @@ const Index = () => {
                             </p>
                             {
                                 (
-                                    event.info && event.info.length > 0 &&
-                                    (
-                                        event.textExpanded ||
-                                        (
-                                            document.getElementById("info-" + index) &&
-                                            document.getElementById("info-" + index)!.scrollHeight !== document.getElementById("info-" + index)!.clientHeight
-                                        ) ||
-                                        event.textExpandable
-                                    )
+                                    event.info && event.info.length > 50
                                 ) ? (
                                     <a onClick={() => expandText(index)}
                                     className='underline hover:no-underline cursor-pointer'>{
